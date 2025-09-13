@@ -150,10 +150,10 @@ const Publisher = mongoose.model("Publisher", PublisherSchema);
 
 app.post("/api/author", async(req,res) => {
   try{
-    if(!body){
+    if(! req.body){
       return res.status(401).json({message: "Request body is missing.."})
     }
-    const {authorID, name, email}=body;
+    const {authorID, name, email}= req.body;
     if(! authorID || ! name || !email){
       return res.status(401).json({message: "Please fill in all fields to commence.."});
     }
@@ -171,13 +171,13 @@ app.post("/api/author", async(req,res) => {
 
   }
   catch(err){
-    console.log("Failed to register user")
+    console.log("Failed to register Author")
   }
 });
 
 app.get("/api/author", async(req,res) => {
   try{
-    if(!body){
+    if(! req.body){
       return res.status(401).json({message: "Request body is missing.."})
     }
     const {authorID, name, email}= req.body;
@@ -197,9 +197,64 @@ app.get("/api/author", async(req,res) => {
     }
   }
   catch(err){
-    console.log("Failed to find user")
+    console.log("Failed to find Author details");
   }
 });
+ 
+
+app.post("/api/publisher", async(req,res) => {
+  try{
+    if(! req.body){
+      return res.status(401).json({message: "Request body is missing.."})
+    }
+    const {publisherID, name, yearOfPublication}= req.body;
+    if(! publisherID || ! name || ! yearOfPublication){
+      return res.status(401).json({message: "Please fill in all fields to commence.."});
+    }
+    const existingPublisher= await Author.findOne({name});
+
+    if(existingPublisher){
+      return res.status(400).json({message: "Publisher already exists"});
+    }
+    const newPublisher = await Publisher.create({
+      publisherID,
+      name,
+      yearOfPublication,
+    });
+    return res.status(201).json({message: "Publisher  added successfully", pubisher: newPublisher});
+
+  }
+  catch(err){
+    console.log("Failed to register publisher")
+  }
+});
+
+app.get("/api/publisher", async(req,res) => {
+  try{
+    if(! req.body){
+      return res.status(401).json({message: "Request body is missing.."})
+    }
+    const {publisherID, name, yearOfPublication}= req.body;
+    if(! publisherID || ! name || ! yearOfPublication){
+      return res.status(401).json({message: "Please fill in all fields to commence.."});
+    }
+    
+    const details = await Publisher.findOne({name});
+    if(details){
+      return res.status(201).json({
+        message: "Publisher details fetched successfully", Publisher: details});
+    }
+    else{
+      return res.status(401).json({
+        message: "Publisher doesn't exist"
+      });
+    }
+  }
+  catch(err){
+    console.log("Failed to find Publisher details");
+  }
+});
+
 
 
 
